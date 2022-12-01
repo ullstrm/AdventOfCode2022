@@ -2296,3 +2296,17 @@ print(sorted.first!.totalCaloriesCarried)
 let totalCaloriesForThreeFattest = sorted.prefix(3).reduce(0, { $0 + $1.totalCaloriesCarried })
 // Second solution
 print(totalCaloriesForThreeFattest)
+
+
+// Third extra solultion
+/**
+ Varje nisse blir hungrig och äter upp maten med minst kalorier den håller på, hur mycket kalorier finns det nu totalt?
+ */
+let elvesAfterEatingFood = elves.map { elf in
+    var sortedFoods = elf.foods.sorted { $0.calories < $1.calories }
+    sortedFoods.removeFirst()
+    return Elf(identifier: elf.identifier, foods: sortedFoods)
+}
+
+let totalCaloriesForAllElves = elvesAfterEatingFood.reduce(0) { $0 + $1.totalCaloriesCarried }
+print(totalCaloriesForAllElves)
