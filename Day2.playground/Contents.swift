@@ -22,6 +22,22 @@ enum Play: Equatable {
         }
     }
 
+    func getWinningMove() -> Play {
+        switch self {
+        case .rock: return .paper
+        case .paper: return .scissors
+        case .scissors: return .rock
+        }
+    }
+
+    func getLoosingMove() -> Play {
+        switch self {
+        case .rock: return .scissors
+        case .paper: return .rock
+        case .scissors: return .paper
+        }
+    }
+
     var pointsIfIChoose: Int {
         switch self {
         case .rock: return 1
@@ -40,6 +56,15 @@ enum Result {
         case .win: return 6
         case .draw: return 3
         case .lose: return 0
+        }
+    }
+
+    init(fromInput: String) {
+        switch fromInput {
+        case "X": self = .lose
+        case "Y": self = .draw
+        case "Z": self = .win
+        default: fatalError()
         }
     }
 }
@@ -71,14 +96,32 @@ struct Round {
 
 struct Game {
 
+    enum InputFormat {
+        case part1, part2
+    }
+
     let rounds: [Round]
 
-    static func parse(input: String) -> Game {
+    static func parse(input: String, inputFormat: InputFormat) -> Game {
         var rounds: [Round] = []
         let rows = input.components(separatedBy: "\n")
         for row in rows {
             let roundAsString = row.components(separatedBy: " ")
-            let round = Round(opponent: Play(elfValue: roundAsString[0]), me: Play(myValue: roundAsString[1]))
+            let round: Round
+            let opponentMove = Play(elfValue: roundAsString[0])
+            let myMove: Play
+            switch inputFormat {
+            case .part1:
+                myMove = Play(myValue: roundAsString[1])
+            case .part2:
+                let expectedResult = Result(fromInput: roundAsString[1])
+                switch expectedResult {
+                case .win: myMove = opponentMove.getWinningMove()
+                case .lose: myMove = opponentMove.getLoosingMove()
+                case .draw: myMove = opponentMove
+                }
+            }
+            round = Round(opponent: opponentMove, me: myMove)
             rounds.append(round)
         }
         return Game(rounds: rounds)
@@ -2594,6 +2637,7 @@ B Y
 A Z
 """
 
-let part1 = Game.parse(input: input).totalPointsForMe
+let part1 = Game.parse(input: input, inputFormat: .part1).totalPointsForMe
 
+let part2 = Game.parse(input: input, inputFormat: .part2).totalPointsForMe
 
