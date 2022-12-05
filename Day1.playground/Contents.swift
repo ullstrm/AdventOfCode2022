@@ -2304,6 +2304,7 @@ print(totalCaloriesForThreeFattest)
  */
 let elvesAfterEatingFood = elves.map { elf in
     var sortedFoods = elf.foods.sorted { $0.calories < $1.calories }
+
     sortedFoods.removeFirst()
     return Elf(identifier: elf.identifier, foods: sortedFoods)
 }
