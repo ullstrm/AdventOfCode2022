@@ -44,6 +44,20 @@ func parseRucksacks(input: String) -> [Rucksack] {
     return rucksacks
 }
 
+class Group {
+
+    var rucksacks: [Rucksack] = []
+
+    private func findDuplicateItemsIn(lhs: [Item], rhs: [Item]) -> [Item] {
+        lhs.filter { rhs.contains($0) }
+    }
+
+    var findUniqueItem: Item {
+        let duplicateBetweenFirstAndSecond = findDuplicateItemsIn(lhs: rucksacks[0].items, rhs: rucksacks[1].items)
+        return findDuplicateItemsIn(lhs: duplicateBetweenFirstAndSecond, rhs: rucksacks[2].items).first!
+    }
+}
+
 let input = """
 BzRmmzZHzVBzgVQmZLPtqqffPqWqJmPLlL
 hpvvTDcrCjhpcrvcGGhfLHMlLtMCqflNlWPJlJ
@@ -347,6 +361,26 @@ pDBrBHpHhlldphHBHhJVFSLnWWFJttCtQSttSS
 hfHrpphHBppfTvmzgMmbLbgf
 """
 
-let part1 = parseRucksacks(input: input).reduce(0) { partialResult, rucksack in
+let rucksacks = parseRucksacks(input: input)
+
+let part1 = rucksacks.reduce(0) { partialResult, rucksack in
     partialResult + rucksack.findDuplicateItem().priority
 }
+
+// Part 2
+var groups: [Group] = []
+
+var currentGroup = Group()
+groups.append(currentGroup)
+for rucksack in rucksacks {
+    if currentGroup.rucksacks.count == 3 {
+        currentGroup = Group()
+        groups.append(currentGroup)
+    }
+    currentGroup.rucksacks.append(rucksack)
+}
+
+let part2 = groups.reduce(0) { partialResult, group in
+    partialResult + group.findUniqueItem.priority
+}
+
